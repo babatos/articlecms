@@ -9,7 +9,7 @@ class Config(object):
     BLOB_STORAGE_KEY = os.environ.get('BLOB_STORAGE_KEY') or '0QNx27/ba/aGGVP/lVgPxSQPVr9Nu/iDrwwsWnco+rNW0KS5Zy1L6GlBKKq2WcbJSX/3ADnauUAH+AStXnZopQ=='
     BLOB_CONTAINER = os.environ.get('BLOB_CONTAINER') or 'images'
 
-    SQL_SERVER = os.environ.get('SQL_SERVER') or 'ducpm34server'
+    SQL_SERVER = os.environ.get('SQL_SERVER') or 'ducpm34server.database.windows.net'
     SQL_DATABASE = os.environ.get('SQL_DATABASE') or 'ducpm34_database'
     SQL_USER_NAME = os.environ.get('SQL_USER_NAME') or 'ducpm34'
     SQL_PASSWORD = os.environ.get('SQL_PASSWORD') or 'Jamepotterbg997@'
