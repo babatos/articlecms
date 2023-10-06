@@ -12,9 +12,9 @@ app = Flask(__name__)
 app.config.from_object(Config)
 # TODO: Add any logging levels and handlers with app.logger
 app.logger.setLevel(logging.WARNING)
-streamHandler = logging.StreamHandler()
-streamHandler.setLevel(logging.WARNING)
-app.logger.addHandler(streamHandler) # add stream handler to app.logger object
+handlerStream = logging.StreamHandler()
+handlerStream.setLevel(logging.WARNING)
+app.logger.addHandler(handlerStream)
 
 Session(app)
 db = SQLAlchemy(app)

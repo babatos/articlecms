@@ -42,13 +42,11 @@ def new_post():
         form=form
     )
 
-
 @app.route('/post/<int:id>', methods=['GET', 'POST'])
 @login_required
 def post(id):
     post = Post.query.get(int(id))
     if request.args.get('action')=='delete':
-        # if the post has image also, delete it
         if post.image_path != None:
             post.delete_image()
         db.session.delete(post)
@@ -74,17 +72,14 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.password_hash == '-': 
-            # OAuth2 users are not allowed to use password
             flash('Not Allowed! Sign in with your Microsoft Account')
             return redirect(url_for('login'))
         elif user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
-            # Log for unsuccessful login attempt:
             app.logger.warning("Invalid login attempt!")
             return redirect(url_for('login'))
 
         login_user(user, remember=form.remember_me.data)
-        # Log for successful login:
         app.logger.warning(f"{user.username} logged in successfully")
         flash(f'Welcome {user.username} !')
         next_page = request.args.get('next')
@@ -95,11 +90,11 @@ def login():
     auth_url = _build_auth_url(scopes=Config.SCOPE, state=session["state"])
     return render_template('login.html', title='Sign In', form=form, auth_url=auth_url)
 
-@app.route(Config.REDIRECT_PATH)  # Its absolute URL must match your app's redirect_uri set in AAD
+@app.route(Config.REDIRECT_PATH)
 def authorized():
     if request.args.get('state') != session.get("state"):
-        return redirect(url_for("home"))  # No-OP. Goes back to Index page
-    if "error" in request.args:  # Authentication/Authorization failure
+        return redirect(url_for("home"))
+    if "error" in request.args:
         return render_template("auth_error.html", result=request.args)
     if request.args.get('code'):
         cache = _load_cache()
@@ -109,8 +104,7 @@ def authorized():
             scopes=Config.SCOPE,
             redirect_uri=url_for('authorized', _external=True, _scheme="https"))
         session["user"] = result.get("id_token_claims")
-        # Get user name from result, preferred_username is email
-        username = session["user"].get('preferred_username').split('@')[0] # Preprocess the email and use it for username
+        username = session["user"].get('preferred_username').split('@')[0]
         user = User.query.filter_by(username=username).first()
         if not user:
             new_user = User(username=username,password_hash='-')
@@ -125,10 +119,8 @@ def authorized():
 @app.route('/logout')
 def logout():
     logout_user()
-    if session.get("user"): # Used MS Login
-        # Wipe out user and its token cache from session
+    if session.get("user"):
         session.clear()
-        # Also logout from your tenant's web session
         return redirect(
             Config.AUTHORITY + "/oauth2/v2.0/logout" +
             "?post_logout_redirect_uri=" + url_for("login", _external=True, _scheme="https"))
